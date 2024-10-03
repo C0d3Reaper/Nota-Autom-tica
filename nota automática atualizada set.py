@@ -135,15 +135,16 @@ codigo_trabalho = determinar_codigo(centro_de_trabalho1, setor1)
 # Coordenadas
 abre_barra_comandos = (61, 50)
 barra_comandos = (119, 53)
-clicasap = (853, 742)
-janelasap = (945, 645)
+clicasap = (765, 740)
+janelasap = (820, 679)
 barrascrolldown = (1340, 240)
 barraprioridade = (491, 539)
 barrascrollup = (1340, 240)
 barraimprimir = (28, 231)
 logoff = (321, 370)
+botao_imprimir = (346, 54)
 
-pyautogui.PAUSE = 0.6
+pyautogui.PAUSE = 0.9
 
 def criar_nota():
     def sap_aberto():
@@ -254,20 +255,15 @@ def save_and_print():
     def on_response(response):
         if response == "Sim":
             pyautogui.hotkey("shift", "f1")
-            pyautogui.hotkey("ctrl", "p")
+            pyautogui.click(botao_imprimir)
             pyautogui.click(barraimprimir)
             pyautogui.press("tab", presses=10)   
             pyautogui.press("enter")
-            imagem = pyautogui.screenshot()
-            imagem.save("print nota automática.png")
-            pyautogui.alert("Print salvo!")
+
         else:
             pyautogui.hotkey("shift", "f1")
             pyautogui.hotkey("ctrl", "s")
-            imagem = pyautogui.screenshot()
-            imagem.save(f"{titulo1} nota automática.png")
-            pyautogui.alert("Print salvo!")
-        
+
         pyautogui.alert("Fim do código!")
 
     # Criar janela de confirmação
@@ -285,7 +281,7 @@ def save_and_print():
 
     root.mainloop()
 
-
+time.sleep (1)
 criar_nota()    
 
 save_and_print()
