@@ -1,60 +1,105 @@
-import sys
+import sys 
 import datetime
 import pyautogui
 import time
 import tkinter as tk
+from tkinter import ttk
 from tkinter import simpledialog, messagebox
 
+# Mensagens de alerta iniciais
 pyautogui.alert(text="ATENÇÃO: o usuário deve fechar todos os aplicativos que ocupam espaço na barra de tarefas, deixando somente os que são fixos da barra.", title="Bem Vindo ao código de notas automáticas!")
 pyautogui.alert(text="DICA: z1 = Corretiva planejada  |  z2 = Corretiva emergencial  |  z3 = Preventiva  |  zm = Requisição de compras  |  z0 = Nota de ação pm  |  z4 = Segurança do trabalho  |  z5 = Preditiva  |  z6 = Melhoria  |  z7 = Análise de falha  |  z8 = Retrabalho  |  z9 = Inspeção  |  zf = Fabricação de peças  |  zp = Projeto |", title="Aqui vai uma dica dos tipos de notas do sap!")
 
+# Função para criar janelas de seleção de opções com botões
 def escolher_opcao(titulo, opcoes):
     root = tk.Tk()
     root.title(titulo)
-    # Centraliza a janela
-    width = 300
-    height = 200
+    width, height = 400, 400  # Aumentei a altura da janela
     x = (root.winfo_screenwidth() // 2) - (width // 2)
     y = (root.winfo_screenheight() // 2) - (height // 2)
     root.geometry(f"{width}x{height}+{x}+{y}")
+    root.resizable(False, False)
 
-    tk.Label(root, text=titulo).pack()
-
+    # Estilo
+    style = ttk.Style()
+    style.configure('TButton', font=('Arial', 12), padding=10)
+    style.configure('TLabel', font=('Arial', 14))
+    
+    # Layout
+    frame = ttk.Frame(root, padding=20)
+    frame.pack(expand=True, fill="both")
+    
+    # Título
+    ttk.Label(frame, text=titulo, anchor="center").pack(pady=10)
+    
+    # Variável para a escolha
     selected_option = [None]
 
     def selecionar(opcao):
         selected_option[0] = opcao
         root.destroy()
 
+    # Criação de botões (usando pack apenas)
     for opcao in opcoes:
-        tk.Button(root, text=opcao, command=lambda o=opcao: selecionar(o)).pack()
-
+        ttk.Button(frame, text=opcao, command=lambda o=opcao: selecionar(o)).pack(
+            pady=5, padx=10, fill="x"
+        )
+    
     root.mainloop()
     return selected_option[0]
 
+
+# Função para capturar tipologia
 def conj_tipologia():
-    tipologias = ['Z0', 'Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7', 'Z8', 'Z9', 'ZF', 'ZM', 'ZP', 'Zf', 'Zm', 'Zp', 'z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'z9', 'zf', 'zm', 'zp']
+    tipologias = ['Z0', 'Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7', 'Z8', 'Z9', 'ZF', 'ZM', 'ZP', 
+                  'Zf', 'Zm', 'Zp', 'z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'z9', 'zf', 'zm', 'zp']
     
     while True:
-        tipologia = pyautogui.prompt(text='Digite o tipo de nota (ex: z1, z2, z3, ...):', title='Qual é o tipo de nota a seguir?')
-        if tipologia in tipologias:
-            return tipologia
-        else:
-            pyautogui.alert("Tipologia inválida! Por favor, insira uma tipologia válida.")
+        tipologia = pyautogui.prompt(text='Digite o tipo de nota (ex: z1, z2, z3, ...):', title='Tipo de Nota', default='')
+        
+        if tipologia is None:
+            pyautogui.alert("Programa encerrado pelo usuário.", "Encerrando")
+            sys.exit()
+        
+        tipologia = tipologia.strip()
+        if tipologia == "":
+            pyautogui.alert("Nenhum valor inserido. Por favor, insira uma tipologia válida.", "Aviso")
+            continue
+        
+        if tipologia not in tipologias:
+            pyautogui.alert("Tipologia inválida! Por favor, insira uma tipologia válida.", "Erro")
+            continue
+        
+        return tipologia
 
-
+# Função para capturar o título
 def conj_titulo():
-    titulo = pyautogui.prompt(text='Digite o título da nota:', title='Título da nota', default='')
-    if titulo is None or titulo.strip() == "":
-        raise ValueError("Nenhum valor foi fornecido. O programa será encerrado.")
-    return titulo
-
+    while True:
+        titulo = pyautogui.prompt(text='Digite o título da nota:', title='Título da nota', default='')
+        if titulo is None:
+            pyautogui.alert("Programa encerrado pelo usuário.", "Encerrando")
+            sys.exit()
+        
+        if titulo.strip() == "":
+            pyautogui.alert("Nenhum valor inserido. Por favor, insira um título válido.", "Aviso")
+            continue
+        
+        return titulo.strip()
+# Função para capturar a descrição com pyautogui.prompt
 def conj_descricao():
-    descricao = pyautogui.prompt(text='Descreva a avaria da máquina:', title='Descrição', default='')
-    if descricao is None or descricao.strip() == "":
-        raise ValueError("Nenhum valor foi fornecido. O programa será encerrado.")
-    return descricao
+    
+    while True:
+        descricao = pyautogui.prompt(text='Descreva a avaria da máquina:', title='Descrição', default='')
+        if descricao is None:
+            pyautogui.alert("Programa encerrado pelo usuário.", "Encerrando")
+            sys.exit()
+        
+        if descricao.strip() == "":
+            pyautogui.alert("Nenhum valor inserido. Por favor, insira uma descrição válida.", "Aviso")
+            continue
+        return descricao
 
+# Função para capturar setor com botões
 def conj_setor():
     setores = ["Embalagem", "Lã de Aço", "Química", "Envase", "Infraestrutura"]
     setor = escolher_opcao('Qual é o setor responsável?', setores)
@@ -62,6 +107,7 @@ def conj_setor():
         raise ValueError("Nenhum valor foi fornecido. O programa será encerrado.")
     return setor
 
+# Função para capturar o equipamento com pyautogui.prompt
 def conj_equipamento():
     while True:
         equipamento = pyautogui.prompt(text='Qual é o equipamento da avaria? (spo1011, emf1013, ...)', title='Código de identificação da máquina', default='')
@@ -72,19 +118,22 @@ def conj_equipamento():
         else:
             return equipamento
 
+# Função para capturar centro de trabalho com botões
 def conj_ctb():
     ctbs = ["Mecânica", "Elétrica"]
-    centro_de_trabalho = escolher_opcao('A máquina apresenta um defeito mecânico ou elétrico?', ctbs)
+    centro_de_trabalho = escolher_opcao('Qual é o tipo de defeito?', ctbs)
     if centro_de_trabalho is None:
         raise ValueError("Nenhum valor foi fornecido. O programa será encerrado.")
     return centro_de_trabalho
 
+# Função para capturar nome do notificador com pyautogui.prompt
 def conj_notficador():
     notificador = pyautogui.prompt(text='Qual é o seu nome?', title='Nome do notificador', default='')
     if notificador is None or notificador.strip() == "":
         raise ValueError("Nenhum valor foi fornecido. O programa será encerrado.")
     return notificador
 
+# Função para capturar se houve parada com botões
 def conj_parada():
     paradas = ["Sim", "Não"]
     parada = escolher_opcao('Houve parada na máquina?', paradas)
@@ -92,6 +141,7 @@ def conj_parada():
         raise ValueError("Nenhum valor foi fornecido. O programa será encerrado.")
     return parada
 
+# Função para capturar prioridade com botões
 def conj_prioridade():
     prioridades = ["Rotina", "Emergencial", "Urgente", "Programável"]
     prioridade = escolher_opcao('Digite a prioridade da nota:', prioridades)
@@ -99,6 +149,7 @@ def conj_prioridade():
         raise ValueError("Nenhum valor foi fornecido. O programa será encerrado.")
     return prioridade
 
+# Função para determinar o código de trabalho com base no centro de trabalho e setor
 def determinar_codigo(centro_de_trabalho, setor):
     if centro_de_trabalho == "Mecânica" and setor == "Embalagem":
         return "embmeca"
@@ -135,14 +186,17 @@ codigo_trabalho = determinar_codigo(centro_de_trabalho1, setor1)
 # Coordenadas
 abre_barra_comandos = (61, 50)
 barra_comandos = (119, 53)
-clicasap = (765, 740)
-janelasap = (820, 679)
+clicasap = (845, 742)
+janelasap = (941, 637)
 barrascrolldown = (1340, 240)
 barraprioridade = (491, 539)
 barrascrollup = (1340, 240)
 barraimprimir = (28, 231)
 logoff = (321, 370)
 botao_imprimir = (346, 54)
+
+dados = titulo1, descricao1, tipologia1, parada1, equipamento1, notificador1, setor1, prioridade1
+print (dados, sep=' ')
 
 pyautogui.PAUSE = 0.9
 
@@ -261,8 +315,10 @@ def save_and_print():
             pyautogui.press("enter")
 
         else:
-            pyautogui.hotkey("shift", "f1")
-            pyautogui.hotkey("ctrl", "s")
+            pyautogui.click(66, 122)
+            time.sleep(1)
+            pyautogui.press('enter')
+
 
         pyautogui.alert("Fim do código!")
 
@@ -282,7 +338,7 @@ def save_and_print():
     root.mainloop()
 
 time.sleep (1)
-criar_nota()    
+criar_nota()
 
 save_and_print()
 
@@ -297,4 +353,3 @@ save_and_print()
 # conj_confirmacao()
 
 print("Fim de código")
-
